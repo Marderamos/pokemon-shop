@@ -1,9 +1,10 @@
 import requests
+from .models import Pokemon
 
 def obtener_pokemones():
     url = "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0"
     respuesta = requests.get(url)
-    data = respuesta.json()
+    data = respuesta.json() # Dar formato JSON o Diccionario
     pokemones = []
     for poke in data["results"]:
         info = requests.get(poke["url"]).json()
@@ -19,13 +20,19 @@ def obtener_pokemones():
         peso = info["weight"]
         altura = info["height"]
         precio = peso * 10 + altura * 5
-        pokemones.append({
-            "Nombre": nombre,
-            "Tipos": tipos,
-            "Habilidades": habilidades,
-            "Peso": peso,
-            "Altura": altura,
-            "Precio": precio
-            })
-        return pokemones
+        
+        pokemon = Pokemon(nombre, habilidades, peso, altura, precio, tipos)
+        
+        pokemones.append(pokemon)
+        
+    return pokemones
     
+def clasificar_por_tipo(pokemones):
+    categorias = {}
+    for pokemon in pokemones:
+        for tipo in pokemon.tipos:
+            if tipo not in categorias:
+                categorias[tipo] = []
+            categorias[tipo].append(pokemon)
+            
+    return categorias
